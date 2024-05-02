@@ -1,7 +1,11 @@
 let img;
 let segments = []; //where we will store each segemnt
 let numSegements = 50; //how many segemnts to creat
-let drawSegments = true;
+let drawSegments = false;
+
+let imgDrwPrps = {aspect: 0, width: 0, height:0, xOffset:0, yOffset:0};
+
+let canvasAspectRatio = 0;
 
 let pixelColour;
 
@@ -26,13 +30,34 @@ function setup() {
   pixelColour = color(0);
 }
 
+function calculateImageDrawProps() {
+  if (imgDrwPrps.aspect > canvasAspectRatio){
+    imgDrwPrps.width =width
+    imgDrwPrps.height = width/imgDrwPrps.aspect;
+    imgDrwPrps.xOffset = 0;
+    imgDrwPrps.yOffset = (height - imgDrwPrps.height)/2;
+
+  }else if  (imgDrwPrps.aspect < canvasAspectRatio){
+  imgDrwPrps.width = height * imgDrwPrps.aspect;
+  imgDrwPrps.height = height;
+  imgDrwPrps.xOffset = (width - imgDrwPrps.width)/2;
+  imgDrwPrps.yOffset = 0;
+  
+  }else if (imgDrwPrps == canvasAspectRatio){
+    imgDrwPrps.width = width;
+    imgDrwPrps.height = height;
+    imgDrwPrps.xOffset = 0;
+    imgDrwPrps.yOffset = 0;
+  }
+}
+
 function draw() {
   if (drawSegments){
     for (const segment of segments){
       segment.draw();
     }
   } else {
-    image(img, 0, 0);
+    image(img,imgDrwPrps.xOffset,imgDrwPrps.yOffset,imgDrwPrps.width,imgDrwPrps.height);
   }
 
 
@@ -51,7 +76,16 @@ function keyPressed(){
   if (key == " "){
     drawSegments = !drawSegments;
   }
+
+
 }
+
+function windowResized() {
+  resizeCanvas(windowWidth,windowHeight);
+  canvasAspectRatio = width/height;
+  calculateImageDrawProps();
+}
+
 class ImageSegment{
 
 
